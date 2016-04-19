@@ -113,27 +113,32 @@ def befor_pub_shangpin():
     shangpin['params_sub_category']['_tb_token_'] = sess.cookies['_tb_token_']
     print(shangpin['params_sub_category'])
     rsp = sess.get(shangpin['pub_url'],params=shangpin['params_sub_category'])
-    #fle = open("step3.html", 'w')
-    #fle.write(rsp.text)
-    #fle.close()
+    if shangpin['brand']:
+        org_soup = BeautifulSoup(rsp.text,"html.parser")
+        content_soup = org_soup.find('select',attrs={'id':'brandSelect'})
+        tag = content_soup.find(text=re.compile(shangpin['brand']))
+        if tag:
+            shangpin['data']['brandSelect'] = tag.parent.get('value')
+    print("brand:%s brandSelect:%s\n" % (shangpin['brand'],shangpin['data']['brandSelect']))
+    fle = open("step3.html", 'w')
+    fle.write(rsp.text)
+    fle.close()
 
 def pub_shangpin():
     global sess
     shangpin['params_sub_category']['_tb_token_'] = sess.cookies['_tb_token_']
     rsp = sess.post(shangpin['pub_url'],params=shangpin['params_sub_category'],data=shangpin['data'])
     soup = BeautifulSoup(rsp.text,'html.parser')
-    if soup.title.text != "全球购官网直购":
+    tag = soup.find(text=re.compile('代拍买手后台'))
+    if tag:
+        print("step4 success\n")
+        return rsp
+    else:
         print("step4 failed\n")
         fle = open("step4.html", 'w')
         fle.write(rsp.text)
         fle.close()
         return None
-    else:
-        fle = open("step4.html", 'w')
-        fle.write(rsp.text)
-        fle.close()
-        print("step4 success\n")
-        return rsp
 
 def get_choose_category():
     #提交url,进入选择类目页面
@@ -201,8 +206,8 @@ def pub_shangpin_final():
     if rsp == None:
         error_code = 1
         return error_code
-    tm = random.randint(2,5)
-    time.sleep(tm)
+    #tm = random.randint(2,5)
+    #time.sleep(tm)
     rsp = get_choose_category()
     if rsp == None:
         error_code = 2
@@ -210,8 +215,8 @@ def pub_shangpin_final():
     tm = random.randint(1,3)
     time.sleep(tm)
     befor_pub_shangpin()
-    tm = random.randint(2,5)
-    time.sleep(tm)
+    #tm = random.randint(2,5)
+    #time.sleep(tm)
     rsp = pub_shangpin()
     if rsp == None:
         error_code = 3
@@ -231,4 +236,4 @@ if __name__ == '__main__':
         parser_url(url)
         pub_shangpin_final()
     else:
-        app.run(host="121.199.6.253", port=8756, debug=True)
+        app.run(host="0.0.0.0", port=8756, debug=True)

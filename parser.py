@@ -5,8 +5,8 @@ import os
 import re
 import random
 from bs4 import BeautifulSoup
-
 shangpin = {
+        'brand':'',
         'pub_url':"http://daigou.taobao.com/buyer/item/publishItem.htm",
         'buyer_url':"http://daigou.taobao.com/buyer/index.htm",
         'params_sub_url':{
@@ -76,7 +76,6 @@ def get_org_url(content_soup):
 
 def parser_url(url):
     target = requests.get(url,headers=ua_headers)
-    brand_list = open("brand_list.txt",'r')
     #html_file = open("html_file.html",'r')
     #org_soup = BeautifulSoup(html_file,"html.parser")
     org_soup = BeautifulSoup(target.text,"html.parser")
@@ -103,11 +102,12 @@ def parser_url(url):
         subtitle_soup = info_soup.find('div',attrs={'class':'info-adwords'})
         shangpin['data']['subtitle'] = subtitle_soup.text[0:30]
     brand_soup = info_soup.find('span')
-    brand = brand_soup.text
-    for line in brand_list.readlines():
-        m  = re.findall(brand,line,re.I)
-        if m:
-            shangpin['data']['brandSelect']=line.split(' ')[0]
+    shangpin['brand'] = brand_soup.text
+    print("first brand:%s brandSelect:%s\n" % (shangpin['brand'],shangpin['data']['brandSelect']))
+    #for line in brand_list.readlines():
+    #    m  = re.findall(brand,line,re.I)
+    #    if m:
+    #        shangpin['data']['brandSelect']=line.split(' ')[0]
 
     price_soup = info_soup.find('div',attrs={'class':'price-info'})
     price_soup = price_soup.find('span',attrs={'class':'lb-value usd-price J-usd-price'})
