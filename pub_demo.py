@@ -41,12 +41,10 @@ def crawler():
             if category2:
                 shangpin['params_sub_category']['category2'] = category2
                 categoryId = request.form['categoryId']
+                shangpin['data']['categoryId'] = categoryId
             else:  
                 error = "请选择二级分类!"
                 return render_template('crawler.html', error1=error,button_name=button_name,user_name=user_name)
-                if categoryId:
-                    shangpin['data']['categoryId'] = categoryId
-
 
         parser_url(url)
         #return render_template('crawler.html', error1=error,button_name=button_name,user_name=user_name)
