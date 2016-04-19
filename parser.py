@@ -97,11 +97,11 @@ def parser_url(url):
     if m.group():
         p = re.compile(r'^[^A-Za-z,【]+')
         shangpin['data']['titleCn'] =  p.sub('',shangpin['data']['titleCn'])
-    shangpin['data']['titleCn']= shangpin['data']['titleCn'][0:52]
+    shangpin['data']['titleCn']= shangpin['data']['titleCn'][0:30]
     shangpin['data']['mobileTitle'] = shangpin['data']['titleCn']
     if shangpin['data']['subtitle'] == '':
         subtitle_soup = info_soup.find('div',attrs={'class':'info-adwords'})
-        shangpin['data']['subtitle'] = subtitle_soup.text[0:52]
+        shangpin['data']['subtitle'] = subtitle_soup.text[0:30]
     brand_soup = info_soup.find('span')
     brand = brand_soup.text
     for line in brand_list.readlines():
@@ -151,9 +151,9 @@ def parser_url(url):
     p=re.compile(r'class="product-desc-wrapper"')
     shangpin['data']['description'] = p.sub('''class="product-desc-wrapper" align="center"''',shangpin['data']['description'])
 
-    #for k,v in shangpin['data'].items():
-    #   print('%s=%s' % (k,v))
-    #print("-------------parser end--------------\r\n")
+    for k,v in shangpin['data'].items():
+       print('%s=%s' % (k,v))
+    print("-------------parser end--------------\r\n")
 
 if __name__ == '__main__':
     url = sys.argv[1]

@@ -13,6 +13,8 @@ from tb_config import *
 import re
 import codecs
 import urllib.parse
+import time
+import random
 
 app = Flask(__name__)
 
@@ -33,7 +35,7 @@ def crawler():
 
         subtitle = request.form['subtitle']
         if subtitle:
-            shangpin['data']['subtitle'] = subtitle[0:27]
+            shangpin['data']['subtitle'] = subtitle[0:30]
         category1 = request.form['category1']
         if category1:
             shangpin['params_sub_category']['category1'] = category1
@@ -42,6 +44,7 @@ def crawler():
                 shangpin['params_sub_category']['category2'] = category2
                 categoryId = request.form['categoryId']
                 shangpin['data']['categoryId'] = categoryId
+                shangpin['params_sub_category']['categoryId'] = categoryId
             else:  
                 error = "请选择二级分类!"
                 return render_template('crawler.html', error1=error,button_name=button_name,user_name=user_name)
@@ -108,6 +111,7 @@ def relogin():
 def befor_pub_shangpin():
     global sess
     shangpin['params_sub_category']['_tb_token_'] = sess.cookies['_tb_token_']
+    print(shangpin['params_sub_category'])
     rsp = sess.get(shangpin['pub_url'],params=shangpin['params_sub_category'])
     #fle = open("step3.html", 'w')
     #fle.write(rsp.text)
@@ -125,6 +129,9 @@ def pub_shangpin():
         fle.close()
         return None
     else:
+        fle = open("step4.html", 'w')
+        fle.write(rsp.text)
+        fle.close()
         print("step4 success\n")
         return rsp
 
@@ -194,11 +201,17 @@ def pub_shangpin_final():
     if rsp == None:
         error_code = 1
         return error_code
+    tm = random.randint(2,5)
+    time.sleep(tm)
     rsp = get_choose_category()
     if rsp == None:
         error_code = 2
         return error_code
+    tm = random.randint(1,3)
+    time.sleep(tm)
     befor_pub_shangpin()
+    tm = random.randint(2,5)
+    time.sleep(tm)
     rsp = pub_shangpin()
     if rsp == None:
         error_code = 3
@@ -218,4 +231,4 @@ if __name__ == '__main__':
         parser_url(url)
         pub_shangpin_final()
     else:
-        app.run(host="192.168.8.198", port=8756, debug=True)
+        app.run(host="121.199.6.253", port=8756, debug=True)
