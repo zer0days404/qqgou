@@ -96,7 +96,7 @@ def parser_url(url):
     m = p1.match(shangpin['data']['titleCn'])
     if m.group():
         p = re.compile(r'^[^A-Za-z,【]+')
-	shangpin['data']['titleCn'] =  p.sub('',shangpin['data']['titleCn'])
+        shangpin['data']['titleCn'] =  p.sub('',shangpin['data']['titleCn'])
     shangpin['data']['titleCn']= shangpin['data']['titleCn'][0:52]
     shangpin['data']['mobileTitle'] = shangpin['data']['titleCn']
     if shangpin['data']['subtitle'] == '':
@@ -140,9 +140,9 @@ def parser_url(url):
     shangpin['data']['pic4'] = img[4]
     
     product_soup = org_soup.find('div',attrs={'class':'product-desc-wrapper'})
-    #del_img = product_soup.find_all('img')
-    #for i in del_img:
-    #    i.decompose()
+    del_img = product_soup.find_all('img')
+    for i in del_img:
+        i.decompose()
     shangpin['data']['description'] = str(product_soup)
     p=re.compile(r'<span .+;">')
     shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
@@ -151,9 +151,9 @@ def parser_url(url):
     p=re.compile(r'class="product-desc-wrapper"')
     shangpin['data']['description'] = p.sub('''class="product-desc-wrapper" align="center"''',shangpin['data']['description'])
 
-    #for k,v in shangpin['data'].items():
-    #   print('%s=%s' % (k,v))
-    #print("-------------parser end--------------\r\n")
+    for k,v in shangpin['data'].items():
+       print('%s=%s' % (k,v))
+    print("-------------parser end--------------\r\n")
 
 if __name__ == '__main__':
     url = sys.argv[1]
