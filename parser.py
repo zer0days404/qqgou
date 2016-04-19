@@ -91,13 +91,17 @@ def parser_url(url):
     title_soup = info_soup.find('h1',attrs={'class':'title'})
     #shangpin['data']['titleCn'] = title_soup.text.split('】')[1]
     shangpin['data']['titleCn'] = re.sub(r"^【直购】",'',title_soup.text)
-    p = re.compile(r'^[\u4e00-\u9fa5]*[A-Za-z,【]{0}')
-    shangpin['data']['titleCn'] =  p.sub('',shangpin['data']['titleCn'])
-    shangpin['data']['titleCn']= shangpin['data']['titleCn'][0:27]
+    #p = re.compile(r'^[\u4e00-\u9fa5]*[A-Za-z,【]{0}')
+    p1 = re.compile(r'^.*[A-Za-z,【]')
+    m = p1.match(shangpin['data']['titleCn'])
+    if m.group():
+        p = re.compile(r'^[^A-Za-z,【]+')
+	shangpin['data']['titleCn'] =  p.sub('',shangpin['data']['titleCn'])
+    shangpin['data']['titleCn']= shangpin['data']['titleCn'][0:52]
     shangpin['data']['mobileTitle'] = shangpin['data']['titleCn']
     if shangpin['data']['subtitle'] == '':
         subtitle_soup = info_soup.find('div',attrs={'class':'info-adwords'})
-        shangpin['data']['subtitle'] = subtitle_soup.text[0:27]
+        shangpin['data']['subtitle'] = subtitle_soup.text[0:52]
     brand_soup = info_soup.find('span')
     brand = brand_soup.text
     for line in brand_list.readlines():
