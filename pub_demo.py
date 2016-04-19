@@ -31,6 +31,9 @@ def crawler():
             error = "请输入合法url!"
             return render_template('crawler.html', error1=error,button_name=button_name,user_name = user_name)
 
+        subtitle = request.form['subtitle']
+        if subtitle:
+            shangpin['data']['subtitle'] = subtitle[0:27]
         category1 = request.form['category1']
         if category1:
             shangpin['params_sub_category']['category1'] = category1
@@ -46,6 +49,7 @@ def crawler():
 
 
         parser_url(url)
+        #return render_template('crawler.html', error1=error,button_name=button_name,user_name=user_name)
         error_code = pub_shangpin_final()
         if error_code == 1:
             error = "打开buyer首页失败，一般是因为登录失败造成"
@@ -81,17 +85,17 @@ def relogin():
                 user_name = urllib.parse.unquote(user_name)
                 user_name = codecs.decode(user_name,'unicode-escape')
                 error = "登陆成功！"
-                return render_template('crawler.html', error2=error,button_name=button_name,user_name=user_name)
+                return render_template('crawler.html', error1=error,button_name=button_name,user_name=user_name)
             else:
                 button_name = "重新登录"
                 error = "登录超时"
-                return render_template('crawler.html', error2=error,button_name=button_name,user_name=user_name)
+                return render_template('crawler.html', error1=error,button_name=button_name,user_name=user_name)
                 
         rsp = sess.get(generate_qrcode)
         if rsp == None:
             error = "获取二维码失败，请再次点击登录！" 
             button_name = "重新登录"
-            return render_template('crawler.html', error2=error,button_name=button_name,user_name=user_name)
+            return render_template('crawler.html', error1=error,button_name=button_name,user_name=user_name)
 
         b = json.loads(rsp.text)
         print(b)
@@ -107,9 +111,9 @@ def befor_pub_shangpin():
     global sess
     shangpin['params_sub_category']['_tb_token_'] = sess.cookies['_tb_token_']
     rsp = sess.get(shangpin['pub_url'],params=shangpin['params_sub_category'])
-    fle = open("step3.html", 'w')
-    fle.write(rsp.text)
-    fle.close()
+    #fle = open("step3.html", 'w')
+    #fle.write(rsp.text)
+    #fle.close()
 
 def pub_shangpin():
     global sess

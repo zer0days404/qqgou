@@ -3,6 +3,7 @@ import requests
 import sys
 import os
 import re
+import random
 from bs4 import BeautifulSoup
 
 shangpin = {
@@ -90,10 +91,13 @@ def parser_url(url):
     title_soup = info_soup.find('h1',attrs={'class':'title'})
     #shangpin['data']['titleCn'] = title_soup.text.split('】')[1]
     shangpin['data']['titleCn'] = re.sub(r"^【直购】",'',title_soup.text)
-    shangpin['data']['titleCn'] =  shangpin['data']['titleCn'][0:27]
+    p = re.compile(r'^[\u4e00-\u9fa5]*[A-Za-z,【]{0}')
+    shangpin['data']['titleCn'] =  p.sub('',shangpin['data']['titleCn'])
+    shangpin['data']['titleCn']= shangpin['data']['titleCn'][0:27]
     shangpin['data']['mobileTitle'] = shangpin['data']['titleCn']
-    subtitle_soup = info_soup.find('div',attrs={'class':'info-adwords'})
-    shangpin['data']['subtitle'] = subtitle_soup.text
+    if shangpin['data']['subtitle'] == '':
+        subtitle_soup = info_soup.find('div',attrs={'class':'info-adwords'})
+        shangpin['data']['subtitle'] = subtitle_soup.text[0:27]
     brand_soup = info_soup.find('span')
     brand = brand_soup.text
     for line in brand_list.readlines():
@@ -107,7 +111,12 @@ def parser_url(url):
     price_soup = info_soup.find('div',attrs={'class':'price-plus'})
     price_soup = price_soup.find('span',attrs={'class':'lb-value J-ref-price'})
     #shangpin['data']['internalPrice'] = price_soup.text.split('￥')[1]
-    shangpin['data']['internalPrice'] = str(float(shangpin['data']['itemPrice'])*6.5*2.5)
+    #shangpin['data']['internalPrice'] = str(float(shangpin['data']['itemPrice'])*6.5*2.5)
+    price_min = int(float(shangpin['data']['itemPrice'])*6.5*2)
+    price_max = int(float(shangpin['data']['itemPrice'])*6.5*3)
+    price = random.randint(price_min,price_max)
+    shangpin['data']['internalPrice'] = str(price)
+
     weight_soup = org_soup.find('div',attrs={'class':'weight-info'})
     weight_soup = weight_soup.find('span',attrs={'class':'lb-value J-weight'})
     #shangpin['data']['weight'] = weight_soup.text.split('磅')[0]
@@ -138,9 +147,9 @@ def parser_url(url):
     p=re.compile(r'class="product-desc-wrapper"')
     shangpin['data']['description'] = p.sub('''class="product-desc-wrapper" align="center"''',shangpin['data']['description'])
 
-    for k,v in shangpin['data'].items():
-       print('%s=%s' % (k,v))
-    print("-------------parser end--------------\r\n")
+    #for k,v in shangpin['data'].items():
+    #   print('%s=%s' % (k,v))
+    #print("-------------parser end--------------\r\n")
 
 if __name__ == '__main__':
     url = sys.argv[1]
