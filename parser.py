@@ -140,9 +140,9 @@ def parser_url(url):
     shangpin['data']['pic4'] = img[4]
     
     product_soup = org_soup.find('div',attrs={'class':'product-desc-wrapper'})
-    del_img = product_soup.find_all('img')
-    for i in del_img:
-        i.decompose()
+    #del_img = product_soup.find_all('img')
+    #for i in del_img:
+    #    i.decompose()
     shangpin['data']['description'] = str(product_soup)
     p=re.compile(r'<span .+;">')
     shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
@@ -151,9 +151,9 @@ def parser_url(url):
     p=re.compile(r'class="product-desc-wrapper"')
     shangpin['data']['description'] = p.sub('''class="product-desc-wrapper" align="center"''',shangpin['data']['description'])
 
-    for k,v in shangpin['data'].items():
-       print('%s=%s' % (k,v))
-    print("-------------parser end--------------\r\n")
+    #for k,v in shangpin['data'].items():
+    #   print('%s=%s' % (k,v))
+    #print("-------------parser end--------------\r\n")
 
 if __name__ == '__main__':
     url = sys.argv[1]
