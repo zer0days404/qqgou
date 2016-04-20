@@ -103,7 +103,6 @@ def parser_url(url):
         shangpin['data']['subtitle'] = subtitle_soup.text[0:30]
     brand_soup = info_soup.find('span')
     shangpin['brand'] = brand_soup.text
-    print("first brand:%s brandSelect:%s\n" % (shangpin['brand'],shangpin['data']['brandSelect']))
     #for line in brand_list.readlines():
     #    m  = re.findall(brand,line,re.I)
     #    if m:
@@ -151,9 +150,9 @@ def parser_url(url):
     p=re.compile(r'class="product-desc-wrapper"')
     shangpin['data']['description'] = p.sub('''class="product-desc-wrapper" align="center"''',shangpin['data']['description'])
 
-    for k,v in shangpin['data'].items():
-       print('%s=%s' % (k,v))
-    print("-------------parser end--------------\r\n")
+    #for k,v in shangpin['data'].items():
+    #   print('%s=%s' % (k,v))
+    #print("-------------parser end--------------\r\n")
 
 if __name__ == '__main__':
     url = sys.argv[1]
