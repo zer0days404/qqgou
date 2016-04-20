@@ -128,7 +128,7 @@ def parser_url(url):
 
     product_soup = org_soup.find('div',attrs={'class':'nav-list-wrapper'})
     img_soup = product_soup.find_all('img')
-    img = ['','','','','']
+    img = ['','','','','','','','','','']
     p=re.compile(r'_\d{3}x\d{3}.+\d$')
     for k,v in enumerate(img_soup):
         img[k] = "http:"+(v.get('data-ks-imagezoom'))
