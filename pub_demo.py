@@ -55,9 +55,9 @@ def crawler():
         if error_code == 1:
             error = "打开buyer首页失败，一般是因为登录失败造成"
         elif error_code == 2:
-            error = "提交类别错误，一般是因为登录失败或类别选择失败"
+            error = "提交类别错误，一般是因为类别选择失败"
         elif error_code == 3:
-            error = "商品发布失败，一般是因为登录失败或表单构造出错"
+            error = "商品发布失败，一般是因为表单构造出错"
         elif error_code == 0:
             error = "商品发布成功，请查看"
 

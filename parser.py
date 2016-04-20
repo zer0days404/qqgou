@@ -93,7 +93,7 @@ def parser_url(url):
     #p = re.compile(r'^[\u4e00-\u9fa5]*[A-Za-z,【]{0}')
     p1 = re.compile(r'^.*[A-Za-z,【]')
     m = p1.match(shangpin['data']['titleCn'])
-    if m.group():
+    if m:
         p = re.compile(r'^[^A-Za-z,【]+')
         shangpin['data']['titleCn'] =  p.sub('',shangpin['data']['titleCn'])
     shangpin['data']['titleCn']= shangpin['data']['titleCn'][0:30]
