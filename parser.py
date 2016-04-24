@@ -4,6 +4,7 @@ import sys
 import os
 import re
 import random
+import string
 from bs4 import BeautifulSoup
 shangpin = {
         'brand':'',
@@ -57,20 +58,39 @@ shangpin = {
             }
         }
 
+SHOP_LIST = {
+        "Amazon" : '1',
+        "eBay" : '2',
+        "6PM" : '3',
+        "jomashop" : '47',
+        "Ashford" : '16'
+        }
+
 ua_headers = {
         'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36'
         }
 
 
-def get_org_url(content_soup):
+def get_org_url(content_soup,shop_id):
     org_url_soup = content_soup.find('a',text='直达官网链接')
     org_url = org_url_soup.get('href')
     org_url = 'http://daigou.taobao.com'+ org_url
     rsp = requests.get(org_url,headers=ua_headers)
     if rsp.status_code == 200:
     #    return "http://www.amazon.com/gp/aw/d/" + rsp.url.split('/')[-1] + ('?ref=mp_s_a_1_1?qid=1460111142&sr=8-1&keywords=%s' % (rsp.url.split('/')[-1]))
-        return rsp.url + '?ref=redir_mobile_desktop?'
-#        return "http://www.amazon.com/dp/B018OGB86G"
+        if shop_id == SHOP_LIST["Amazon"]:
+            shop_code = rsp.url.split('/')[-1]
+            url = 'http://www.amazon.com/gp/aw/d/' + shop_code + '/' + ''.join(random.sample(string.ascii_letters + string.digits, 10))
+        elif shop_id == SHOP_LIST["eBay"]:
+            url = rsp.url.split('?')[0] + '/' + ''.join(random.sample(string.digits, 10))
+        elif shop_id == SHOP_LIST["6PM"]:
+            url = rsp.url + '?' + ''.join(random.sample(string.digits, 7))
+        elif shop_id == SHOP_LIST["jomashop"]:
+            url = rsp.url + '?' + ''.join(random.sample(string.digits, 7))
+        elif shop_id == SHOP_LIST["Ashford"]:
+        #    url = rsp.url + "?ref=http://www.guanggoo.com/t/5777"
+            url = rsp.url.split('?')[0].split('.pid')[0] + ''.join(random.sample(string.ascii_letters, 2)) + '.pid'
+        return url
     else:
         return None
 
@@ -80,11 +100,18 @@ def parser_url(url):
     #org_soup = BeautifulSoup(html_file,"html.parser")
     org_soup = BeautifulSoup(target.text,"html.parser")
 
+    soup_shop = org_soup.find('div',attrs={'class':'hd'})
+    shangpin['data']['shopName'] = soup_shop.a.text
+    shangpin['data']['shopId'] = SHOP_LIST[shangpin['data']['shopName']]
+
+#    print("shopName:%s shopId:%s" % (shangpin['data']['shopName'],shangpin['data']['shopId']))
+
     content_soup = org_soup.find('div',attrs={'class':'content clearfix'}) 
-    org_url = get_org_url(content_soup)
+    org_url = get_org_url(content_soup,shangpin['data']['shopId'])
     shangpin['params_sub_url']['itemUrl'] = org_url
     shangpin['params_sub_category']['encodeUrl'] = org_url
     shangpin['data']['itemUrl'] = org_url
+    
     
     info_soup = org_soup.find('div',attrs={'class':'detail-info'}) 
     title_soup = info_soup.find('h1',attrs={'class':'title'})
@@ -164,9 +191,9 @@ def parser_url(url):
     p=re.compile(r'class="product-desc-wrapper"')
     shangpin['data']['description'] = p.sub('''class="product-desc-wrapper" align="center"''',shangpin['data']['description'])
 
-    #for k,v in shangpin['data'].items():
-    #   print('%s=%s' % (k,v))
-    #print("-------------parser end--------------\r\n")
+#    for k,v in shangpin['data'].items():
+#       print('%s=%s' % (k,v))
+#    print("-------------parser end--------------\r\n")
 
 if __name__ == '__main__':
     url = sys.argv[1]
