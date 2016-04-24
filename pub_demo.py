@@ -35,7 +35,7 @@ def crawler():
 
         subtitle = request.form['subtitle']
         if subtitle:
-            shangpin['data']['subtitle'] = subtitle[0:30]
+            shangpin['data']['subtitle'] = subtitle[0:52]
         category1 = request.form['category1']
         if category1:
             shangpin['params_sub_category']['category1'] = category1

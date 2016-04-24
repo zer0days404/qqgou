@@ -123,11 +123,11 @@ def parser_url(url):
     if m:
         p = re.compile(r'^[^A-Za-z,【]+')
         shangpin['data']['titleCn'] =  p.sub('',shangpin['data']['titleCn'])
-    shangpin['data']['titleCn']= shangpin['data']['titleCn'][0:30]
+    shangpin['data']['titleCn']= shangpin['data']['titleCn'][0:52]
     shangpin['data']['mobileTitle'] = shangpin['data']['titleCn']
     if shangpin['data']['subtitle'] == '':
         subtitle_soup = info_soup.find('div',attrs={'class':'info-adwords'})
-        shangpin['data']['subtitle'] = subtitle_soup.text[0:30]
+        shangpin['data']['subtitle'] = subtitle_soup.text[0:52]
     brand_soup = info_soup.find('span')
     shangpin['brand'] = brand_soup.text
     #for line in brand_list.readlines():
