@@ -55,7 +55,7 @@ def crawler():
         now = datetime.datetime.now()
         tm = now.strftime("%Y-%m-%d %H:%M:%S")
         if error_code:
-            print("pub failed:[%s] [%s] [%s]\n" % (url,error_code,tm))
+            print("pub failed:[%s] [%s] [%s]\n" % (url,tm,error_code))
             error = error_code
         else:
             error = "发布成功！"

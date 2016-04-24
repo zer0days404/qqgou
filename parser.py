@@ -147,6 +147,20 @@ def parser_url(url):
     shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
     p=re.compile(r'</span>')
     shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
+
+    p=re.compile(r'<strong>')
+    shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
+    p=re.compile(r'</strong>')
+    shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
+
+    p=re.compile(r'<font [^>]+>')
+    shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
+    p=re.compile(r'</font>')
+    shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
+
+    p = re.compile(r'style="[^>]+;"')
+    shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
+
     p=re.compile(r'class="product-desc-wrapper"')
     shangpin['data']['description'] = p.sub('''class="product-desc-wrapper" align="center"''',shangpin['data']['description'])
 
