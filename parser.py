@@ -116,7 +116,8 @@ def parser_url(url):
     info_soup = org_soup.find('div',attrs={'class':'detail-info'}) 
     title_soup = info_soup.find('h1',attrs={'class':'title'})
     #shangpin['data']['titleCn'] = title_soup.text.split('】')[1]
-    shangpin['data']['titleCn'] = re.sub(r"^【直购】",'',title_soup.text)
+    shangpin['data']['titleCn'] = re.sub(r"【直购】",'',title_soup.text)
+    shangpin['data']['titleCn'] = re.sub(r"【可用券】",'',shangpin['data']['titleCn'])
     #p = re.compile(r'^[\u4e00-\u9fa5]*[A-Za-z,【]{0}')
     p1 = re.compile(r'^.*[A-Za-z,【]')
     m = p1.match(shangpin['data']['titleCn'])
@@ -191,9 +192,9 @@ def parser_url(url):
     p=re.compile(r'class="product-desc-wrapper"')
     shangpin['data']['description'] = p.sub('''class="product-desc-wrapper" align="center"''',shangpin['data']['description'])
 
-#    for k,v in shangpin['data'].items():
-#       print('%s=%s' % (k,v))
-#    print("-------------parser end--------------\r\n")
+    #for k,v in shangpin['data'].items():
+    #   print('%s=%s' % (k,v))
+    #print("-------------parser end--------------\r\n")
 
 if __name__ == '__main__':
     url = sys.argv[1]
