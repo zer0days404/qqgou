@@ -167,9 +167,9 @@ def parser_url(url):
     shangpin['data']['pic4'] = img[4]
     
     product_soup = org_soup.find('div',attrs={'class':'product-desc-wrapper'})
-    #del_img = product_soup.find_all('img')
-    #for i in del_img:
-    #    i.decompose()
+    del_img = product_soup.find_all('img',attrs={"src":re.compile(r'img.alicdn.com/tps/')})
+    for i in del_img:
+        i.decompose()
     shangpin['data']['description'] = str(product_soup)
     p=re.compile(r'<span .+;">')
     shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
