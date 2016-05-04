@@ -110,6 +110,8 @@ def parser_url(url):
 
     content_soup = org_soup.find('div',attrs={'class':'content clearfix'}) 
     org_url = get_org_url(content_soup,shangpin['data']['shopId'])
+    if org_url == None:
+        return False
     shangpin['params_sub_url']['itemUrl'] = org_url
     shangpin['params_sub_category']['encodeUrl'] = org_url
     shangpin['data']['itemUrl'] = org_url
@@ -197,6 +199,7 @@ def parser_url(url):
     #for k,v in shangpin['data'].items():
     #   print('%s=%s' % (k,v))
     #print("-------------parser end--------------\r\n")
+    return True
 
 if __name__ == '__main__':
     url = sys.argv[1]

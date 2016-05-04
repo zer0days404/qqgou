@@ -27,6 +27,15 @@ def crawler():
     if request.method == 'POST': 
         #print(request.form)
         url = request.form['url']
+        shop_list = request.form['shop_list']
+        if shop_list:
+            rv = shop_list.replace('|','').isdigit()
+            if rv == False: 
+                error = "请输入合法商品列表，以|隔开!"
+                return render_template('crawler.html', error1=error,button_name=button_name,user_name = user_name)
+            else:
+                shop_list = shop_list.split('|')
+
         p = re.compile(r'^http.+')
         m = p.match(url)
         if m == None:
@@ -49,17 +58,48 @@ def crawler():
                 error = "请选择二级分类!"
                 return render_template('crawler.html', error1=error,button_name=button_name,user_name=user_name)
 
-        parser_url(url)
-        #return render_template('crawler.html', error1=error,button_name=button_name,user_name=user_name)
-        error_code = pub_shangpin_final()
-        now = datetime.datetime.now()
-        tm = now.strftime("%Y-%m-%d %H:%M:%S")
-        if error_code:
-            print("pub failed:[%s] [%s] [%s]\n" % (url,tm,error_code))
-            error = error_code
-        else:
-            error = "发布成功！"
-            print("pub success:[%s] [%s]\n" % (url,tm))
+        if url:
+            rv = parser_url(url)
+            if rv == False:
+                error = "url无法解析，请检查输入是否正确"
+                return render_template('crawler.html', error1=error,button_name=button_name,user_name=user_name)
+
+            error_code = pub_shangpin_final()
+            now = datetime.datetime.now()
+            tm = now.strftime("%Y-%m-%d %H:%M:%S")
+            if error_code:
+                print("pub failed:[%s] [%s] [%s]\n" % (url,tm,error_code))
+                error = error_code
+            else:
+                error = "发布成功！"
+                print("pub success:[%s] [%s]\n" % (url,tm))
+            return render_template('crawler.html', error1=error,button_name=button_name,user_name=user_name)
+
+        if shop_list:
+            success_ = []
+            failed_ = []
+            for id in shop_list:
+                url = "http://daigou.taobao.com/item.htm?&id=" + id
+                rv = parser_url(url)
+                if rv == False:
+                    failed_.append(id)
+                    continue
+
+                error_code = pub_shangpin_final()
+                now = datetime.datetime.now()
+                tm = now.strftime("%Y-%m-%d %H:%M:%S")
+                if error_code:
+                    print("pub failed:[%s] [%s] [%s]\n" % (url,tm,error_code))
+                    failed_.append(id)
+                    continue
+                else:
+                    success_.append(id)
+                    continue
+                    print("pub success:[%s] [%s]\n" % (url,tm))
+            error = "success:%s" % success_
+            error += "\n"
+            error += "failed:%s" % failed_
+            return render_template('crawler.html', error1=error,button_name=button_name,user_name=user_name)
 
 
     return render_template('crawler.html', error1=error,button_name=button_name,user_name=user_name)
@@ -226,4 +266,4 @@ if __name__ == '__main__':
         parser_url(url)
         pub_shangpin_final()
     else:
-        app.run(host="0.0.0.0", port=8756, debug=False)
+        app.run(host="0.0.0.0", port=8757, debug=False)
