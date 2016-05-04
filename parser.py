@@ -78,8 +78,10 @@ def get_org_url(content_soup,shop_id):
     rsp = requests.get(org_url,headers=ua_headers)
     if rsp.status_code == 200:
     #    return "http://www.amazon.com/gp/aw/d/" + rsp.url.split('/')[-1] + ('?ref=mp_s_a_1_1?qid=1460111142&sr=8-1&keywords=%s' % (rsp.url.split('/')[-1]))
+    
         if shop_id == SHOP_LIST["Amazon"]:
-            shop_code = rsp.url.split('/')[-1]
+            #shop_code = rsp.url.split('/')[-1]
+            shop_code = rsp.url.split("dp/")[-1].split('/')[0]
             url = 'http://www.amazon.com/gp/aw/d/' + shop_code + '/' + ''.join(random.sample(string.ascii_letters + string.digits, 10))
         elif shop_id == SHOP_LIST["eBay"]:
             url = rsp.url.split('?')[0] + '/' + ''.join(random.sample(string.digits, 10))
