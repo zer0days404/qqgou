@@ -38,7 +38,7 @@ def crawler():
 
         p = re.compile(r'^http.+')
         m = p.match(url)
-        if m == None:
+        if url and m == None:
             error = "请输入合法url!"
             return render_template('crawler.html', error1=error,button_name=button_name,user_name = user_name)
 
@@ -61,7 +61,7 @@ def crawler():
         if url:
             rv = parser_url(url)
             if rv == False:
-                error = "url无法解析，请检查输入是否正确"
+                error = "官网直达链接不可达，请检查"
                 return render_template('crawler.html', error1=error,button_name=button_name,user_name=user_name)
 
             error_code = pub_shangpin_final()
@@ -93,9 +93,11 @@ def crawler():
                     failed_.append(id)
                     continue
                 else:
+                    print("pub success:[%s] [%s]\n" % (url,tm))
                     success_.append(id)
                     continue
-                    print("pub success:[%s] [%s]\n" % (url,tm))
+                tm = random.randint(2,4)
+                time.sleep(tm)
             error = "success:%s" % success_
             error += "\n"
             error += "failed:%s" % failed_
@@ -266,4 +268,4 @@ if __name__ == '__main__':
         parser_url(url)
         pub_shangpin_final()
     else:
-        app.run(host="0.0.0.0", port=8757, debug=False)
+        app.run(host="0.0.0.0", port=8757, debug=True)
