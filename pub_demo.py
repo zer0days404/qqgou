@@ -24,10 +24,29 @@ def crawler():
     global sess,lgToken,user_name
     error = ''
     button_name = "重新登录"
+    loop_time = 1
+    sleep_min = 1
+    sleep_max = 3
     if request.method == 'POST': 
         #print(request.form)
         url = request.form['url']
         shop_list = request.form['shop_list']
+        sleep = request.form['sleep_time']
+        if request.form['loop_time']:
+            loop_time = int(request.form['loop_time'])
+            if loop_time > 10 or loop_time < 0:
+                    error = "请输入合法循环次数，最多不能超过10次"
+                    return render_template('crawler.html', error1=error,button_name=button_name,user_name = user_name)
+
+        if sleep: 
+            if sleep.split('-')[0].isdigit() and sleep.split('-')[1].isdigit():
+                sleep_min = sleep.split('-')[0]
+                sleep_max = sleep.split('-')[1]
+            else:
+                error = "请输入合法sleep区间"
+                return render_template('crawler.html', error1=error,button_name=button_name,user_name = user_name)
+
+
         if shop_list:
             rv = shop_list.replace('|','').isdigit()
             if rv == False: 
@@ -74,33 +93,34 @@ def crawler():
                 error = "发布成功！"
                 print("pub success:[%s] [%s]\n" % (url,tm))
             return render_template('crawler.html', error1=error,button_name=button_name,user_name=user_name)
-
+        #print(sleep_min,sleep_max,loop_time)
         if shop_list:
             success_ = []
             failed_ = []
-            for id in shop_list:
-                url = "http://daigou.taobao.com/item.htm?&id=" + id
-                rv = parser_url(url)
-                if rv == False:
-                    failed_.append(id)
-                    continue
+            for i in range(0,loop_time):
+                for id in shop_list:
+                    url = "http://daigou.taobao.com/item.htm?&id=" + id
+                    rv = parser_url(url)
+                    if rv == False:
+                        failed_.append(id)
+                        continue
 
-                error_code = pub_shangpin_final()
-                now = datetime.datetime.now()
-                tm = now.strftime("%Y-%m-%d %H:%M:%S")
-                if error_code:
-                    print("pub failed:[%s] [%s] [%s]\n" % (url,tm,error_code))
-                    failed_.append(id)
-                    continue
-                else:
-                    print("pub success:[%s] [%s]\n" % (url,tm))
-                    success_.append(id)
-                    continue
-                tm = random.randint(2,4)
-                time.sleep(tm)
-            error = "success:%s" % success_
-            error += "\n"
-            error += "failed:%s" % failed_
+                    error_code = pub_shangpin_final()
+                    now = datetime.datetime.now()
+                    tm = now.strftime("%Y-%m-%d %H:%M:%S")
+                    if error_code:
+                        print("pub failed:[%s] [%s] [%s]\n" % (url,tm,error_code))
+                        failed_.append(id)
+                        continue
+                    else:
+                        print("pub success:[%s] [%s]\n" % (url,tm))
+                        success_.append(id)
+                        continue
+                    tm = random.randint(sleep_min,sleep_max)
+                    time.sleep(tm)
+                error = "success:%s" % success_
+                error += "\n"
+                error += "failed:%s" % failed_
             return render_template('crawler.html', error1=error,button_name=button_name,user_name=user_name)
 
 
