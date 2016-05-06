@@ -111,13 +111,12 @@ def crawler():
                     if error_code:
                         print("pub failed:[%s] [%s] [%s]\n" % (url,tm,error_code))
                         failed_.append(id)
-                        continue
                     else:
                         print("pub success:[%s] [%s]\n" % (url,tm))
                         success_.append(id)
-                        continue
-                    tm = random.randint(sleep_min,sleep_max)
+                    tm = random.randint(int(sleep_min),int(sleep_max))
                     time.sleep(tm)
+                    continue
                 error = "success:%s" % success_
                 error += "\n"
                 error += "failed:%s" % failed_
