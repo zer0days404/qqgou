@@ -99,24 +99,27 @@ def crawler():
             failed_ = []
             for i in range(0,loop_time):
                 for id in shop_list:
-                    url = "http://daigou.taobao.com/item.htm?&id=" + id
-                    rv = parser_url(url)
-                    if rv == False:
-                        failed_.append(id)
-                        continue
+                    try:
+                        url = "http://daigou.taobao.com/item.htm?&id=" + id
+                        rv = parser_url(url)
+                        if rv == False:
+                            failed_.append(id)
+                            continue
 
-                    error_code = pub_shangpin_final()
-                    now = datetime.datetime.now()
-                    tm = now.strftime("%Y-%m-%d %H:%M:%S")
-                    if error_code:
-                        print("pub failed:[%s] [%s] [%s]\n" % (url,tm,error_code))
-                        failed_.append(id)
-                    else:
-                        print("pub success:[%s] [%s]\n" % (url,tm))
-                        success_.append(id)
-                    tm = random.randint(int(sleep_min),int(sleep_max))
-                    time.sleep(tm)
-                    continue
+                        error_code = pub_shangpin_final()
+                        now = datetime.datetime.now()
+                        tm = now.strftime("%Y-%m-%d %H:%M:%S")
+                        if error_code:
+                            print("pub failed:[%s] [%s] [%s]\n" % (url,tm,error_code))
+                            failed_.append(id)
+                        else:
+                            print("pub success:[%s] [%s]\n" % (url,tm))
+                            success_.append(id)
+                        tm = random.randint(int(sleep_min),int(sleep_max))
+                        time.sleep(tm)
+                        continue
+                    except:
+                        continue
                 error = "success:%s" % success_
                 error += "\n"
                 error += "failed:%s" % failed_

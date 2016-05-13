@@ -63,7 +63,8 @@ SHOP_LIST = {
         "eBay" : '2',
         "6PM" : '3',
         "jomashop" : '47',
-        "Ashford" : '16'
+        "Ashford" : '16',
+        "Amazon.jp" : '49'
         }
 
 ua_headers = {
@@ -92,6 +93,15 @@ def get_org_url(content_soup,shop_id):
         elif shop_id == SHOP_LIST["Ashford"]:
         #    url = rsp.url + "?ref=http://www.guanggoo.com/t/5777"
             url = rsp.url.split('?')[0].split('.pid')[0] + ''.join(random.sample(string.ascii_letters, 2)) + '.pid'
+        elif shop_id == SHOP_LIST["Amazon.jp"]:
+            url=rsp.url
+            if "/product/" in rsp.url:
+                shop_code = rsp.url.split("product/")[-1].split('/')[0]
+                url = 'http://www.amazon.co.jp/gp/aw/d/' + shop_code + '/' + ''.join(random.sample(string.ascii_letters + string.digits, 10))
+            elif "/dp/" in rsp.url:
+                shop_code = rsp.url.split("dp/")[-1].split('/')[0]
+                url = 'http://www.amazon.co.jp/gp/aw/d/' + shop_code + '/' + ''.join(random.sample(string.ascii_letters + string.digits, 10))
+            shangpin['data']['transportTemplate'] = '17'
         return url
     else:
         return None
@@ -147,10 +157,16 @@ def parser_url(url):
     price_soup = price_soup.find('span',attrs={'class':'lb-value J-ref-price'})
     #shangpin['data']['internalPrice'] = price_soup.text.split('￥')[1]
     #shangpin['data']['internalPrice'] = str(float(shangpin['data']['itemPrice'])*6.5*2.5)
-    price_min = int(float(shangpin['data']['itemPrice'])*6.5*2)
-    price_max = int(float(shangpin['data']['itemPrice'])*6.5*3)
-    price = random.randint(price_min,price_max)
-    shangpin['data']['internalPrice'] = str(price)
+    if shangpin['data']['transportTemplate'] == '17':
+        price_min = int(float(shangpin['data']['itemPrice'])*0.0598*2)
+        price_max = int(float(shangpin['data']['itemPrice'])*0.0598*3)
+        price = random.randint(price_min,price_max)
+        shangpin['data']['internalPrice'] = str(price)
+    else:
+        price_min = int(float(shangpin['data']['itemPrice'])*6.5*2)
+        price_max = int(float(shangpin['data']['itemPrice'])*6.5*3)
+        price = random.randint(price_min,price_max)
+        shangpin['data']['internalPrice'] = str(price)
 
     weight_soup = org_soup.find('div',attrs={'class':'weight-info'})
     weight_soup = weight_soup.find('span',attrs={'class':'lb-value J-weight'})
@@ -173,6 +189,26 @@ def parser_url(url):
     product_soup = org_soup.find('div',attrs={'class':'product-desc-wrapper'})
     del_img = product_soup.find_all('img',attrs={"src":re.compile(r'img.alicdn.com/tps/')})
     for i in del_img:
+        i.decompose()
+    '''
+    del_img = product_soup.find_all('img',attrs={"src":re.compile(r'TB1NInJHVXXXXaOXVXXXXXXXXXX')})
+    for i in del_img:
+        i.decompose()
+    del_img = product_soup.find_all('img',attrs={"src":re.compile(r'TB1gCBbJVXXXXb0XXXXXXXXXXXX')})
+    for i in del_img:
+        i.decompose()
+    del_img = product_soup.find_all('img',attrs={"src":re.compile(r'TB12BcrJFXXXXXZapXXXXXXXXXX')})
+    for i in del_img:
+        i.decompose()
+    del_img = product_soup.find_all('img',attrs={"src":re.compile(r'TB2Csz7gFXXXXblXXXXXXXXXXXX')})
+    for i in del_img:
+        i.decompose()
+    del_img = product_soup.find_all('img',attrs={"src":re.compile(r'TB1nMsIIXXXXXXsaXXXXXXXXXXX')})
+    for i in del_img:
+        i.decompose()
+    '''
+    del_a = product_soup.find_all('a')
+    for i in del_a:
         i.decompose()
     shangpin['data']['description'] = str(product_soup)
     p=re.compile(r'<span .+;">')
