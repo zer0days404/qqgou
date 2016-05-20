@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import requests
 import sys
 import os
@@ -157,7 +158,7 @@ def parser_url(url):
     price_soup = price_soup.find('span',attrs={'class':'lb-value J-ref-price'})
     #shangpin['data']['internalPrice'] = price_soup.text.split('￥')[1]
     #shangpin['data']['internalPrice'] = str(float(shangpin['data']['itemPrice'])*6.5*2.5)
-    if shangpin['data']['transportTemplate'] == '17':
+    if shangpin['data']['shopId'] == SHOP_LIST["Amazon.jp"]:
         price_min = int(float(shangpin['data']['itemPrice'])*0.0598*2)
         price_max = int(float(shangpin['data']['itemPrice'])*0.0598*3)
         price = random.randint(price_min,price_max)
@@ -211,10 +212,11 @@ def parser_url(url):
     for i in del_a:
         i.decompose()
     shangpin['data']['description'] = str(product_soup)
-    p=re.compile(r'<span .+;">')
-    shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
-    p=re.compile(r'</span>')
-    shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
+    if shangpin['data']['shopId'] != SHOP_LIST["Amazon.jp"]:
+        p=re.compile(r'<span style=".+;">')
+        shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
+        p=re.compile(r'</span>')
+        shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
 
     p=re.compile(r'<strong>')
     shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
@@ -228,7 +230,6 @@ def parser_url(url):
 
     p = re.compile(r'style="[^>]+;"')
     shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
-
     p=re.compile(r'class="product-desc-wrapper"')
     shangpin['data']['description'] = p.sub('''class="product-desc-wrapper" align="center"''',shangpin['data']['description'])
 

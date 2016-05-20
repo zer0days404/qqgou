@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from flask import Flask, session, request
 from flask.ext.session import Session
 from flask import render_template
