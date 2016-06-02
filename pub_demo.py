@@ -33,6 +33,7 @@ def crawler():
         url = request.form['url']
         shop_list = request.form['shop_list']
         sleep = request.form['sleep_time']
+        mode = request.form['mode']
         if request.form['loop_time']:
             loop_time = int(request.form['loop_time'])
             if loop_time > 10 or loop_time < 0:
@@ -63,8 +64,11 @@ def crawler():
             return render_template('crawler.html', error1=error,button_name=button_name,user_name = user_name)
 
         subtitle = request.form['subtitle']
+        #print(subtitle)
         if subtitle:
             shangpin['data']['subtitle'] = subtitle[0:52]
+        else:
+            shangpin['data']['subtitle'] = ''
         category1 = request.form['category1']
         if category1:
             shangpin['params_sub_category']['category1'] = category1
@@ -79,7 +83,7 @@ def crawler():
                 return render_template('crawler.html', error1=error,button_name=button_name,user_name=user_name)
 
         if url:
-            rv = parser_url(url)
+            rv = parser_url(url,mode=mode)
             if rv == False:
                 error = "官网直达链接不可达，请检查"
                 return render_template('crawler.html', error1=error,button_name=button_name,user_name=user_name)
@@ -102,7 +106,7 @@ def crawler():
                 for id in shop_list:
                     try:
                         url = "http://daigou.taobao.com/item.htm?&id=" + id
-                        rv = parser_url(url)
+                        rv = parser_url(url,mode=mode)
                         if rv == False:
                             failed_.append(id)
                             continue
@@ -291,4 +295,4 @@ if __name__ == '__main__':
         parser_url(url)
         pub_shangpin_final()
     else:
-        app.run(host="0.0.0.0", port=8757, debug=True)
+        app.run(host="0.0.0.0", port=1234, debug=True)

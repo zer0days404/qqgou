@@ -107,7 +107,7 @@ def get_org_url(content_soup,shop_id):
     else:
         return None
 
-def parser_url(url):
+def parser_url(url,mode="normal_mode"):
     target = requests.get(url,headers=ua_headers)
     #html_file = open("html_file.html",'r')
     #org_soup = BeautifulSoup(html_file,"html.parser")
@@ -126,20 +126,23 @@ def parser_url(url):
     shangpin['params_sub_url']['itemUrl'] = org_url
     shangpin['params_sub_category']['encodeUrl'] = org_url
     shangpin['data']['itemUrl'] = org_url
-    
-    
+     
     info_soup = org_soup.find('div',attrs={'class':'detail-info'}) 
     title_soup = info_soup.find('h1',attrs={'class':'title'})
-    #shangpin['data']['titleCn'] = title_soup.text.split('】')[1]
-    shangpin['data']['titleCn'] = re.sub(r"【直购】",'',title_soup.text)
-    shangpin['data']['titleCn'] = re.sub(r"【可用券】",'',shangpin['data']['titleCn'])
-    #p = re.compile(r'^[\u4e00-\u9fa5]*[A-Za-z,【]{0}')
-    p1 = re.compile(r'^.*[A-Za-z,【]')
-    m = p1.match(shangpin['data']['titleCn'])
-    if m:
-        p = re.compile(r'^[^A-Za-z,【]+')
-        shangpin['data']['titleCn'] =  p.sub('',shangpin['data']['titleCn'])
-    shangpin['data']['titleCn']= shangpin['data']['titleCn'][0:52]
+    if mode == 'normal_mode':
+        shangpin['data']['titleCn'] = title_soup.text
+    else:
+        #shangpin['data']['titleCn'] = title_soup.text.split('】')[1]
+        shangpin['data']['titleCn'] = re.sub(r"【直购】",'',title_soup.text)
+        shangpin['data']['titleCn'] = re.sub(r"【可用券】",'',shangpin['data']['titleCn'])
+        #p = re.compile(r'^[\u4e00-\u9fa5]*[A-Za-z,【]{0}')
+        p1 = re.compile(r'^.*[A-Za-z,【]')
+        m = p1.match(shangpin['data']['titleCn'])
+        if m:
+            p = re.compile(r'^[^A-Za-z,【]+')
+            shangpin['data']['titleCn'] =  p.sub('',shangpin['data']['titleCn'])
+        shangpin['data']['titleCn']= shangpin['data']['titleCn'][0:52]
+
     shangpin['data']['mobileTitle'] = shangpin['data']['titleCn']
     if shangpin['data']['subtitle'] == '':
         subtitle_soup = info_soup.find('div',attrs={'class':'info-adwords'})
@@ -158,21 +161,37 @@ def parser_url(url):
     price_soup = price_soup.find('span',attrs={'class':'lb-value J-ref-price'})
     #shangpin['data']['internalPrice'] = price_soup.text.split('￥')[1]
     #shangpin['data']['internalPrice'] = str(float(shangpin['data']['itemPrice'])*6.5*2.5)
-    if shangpin['data']['shopId'] == SHOP_LIST["Amazon.jp"]:
-        price_min = int(float(shangpin['data']['itemPrice'])*0.0598*2)
-        price_max = int(float(shangpin['data']['itemPrice'])*0.0598*3)
-        price = random.randint(price_min,price_max)
-        shangpin['data']['internalPrice'] = str(price)
+    if mode == "normal_mode":
+        try:
+            shangpin['data']['internalPrice'] = price_soup.text.split('￥')[1]
+        except: 
+            shangpin['data']['internalPrice'] = price_soup.text
     else:
-        price_min = int(float(shangpin['data']['itemPrice'])*6.5*2)
-        price_max = int(float(shangpin['data']['itemPrice'])*6.5*3)
-        price = random.randint(price_min,price_max)
-        shangpin['data']['internalPrice'] = str(price)
+        if shangpin['data']['shopId'] == SHOP_LIST["Amazon.jp"]:
+            price_min = int(float(shangpin['data']['itemPrice'])*0.0598*2)
+            price_max = int(float(shangpin['data']['itemPrice'])*0.0598*3)
+            price = random.randint(price_min,price_max)
+            shangpin['data']['internalPrice'] = str(price)
+        else:
+            price_min = int(float(shangpin['data']['itemPrice'])*6.5*2)
+            price_max = int(float(shangpin['data']['itemPrice'])*6.5*3)
+            price = random.randint(price_min,price_max)
+            shangpin['data']['internalPrice'] = str(price)
 
     weight_soup = org_soup.find('div',attrs={'class':'weight-info'})
     weight_soup = weight_soup.find('span',attrs={'class':'lb-value J-weight'})
-    #shangpin['data']['weight'] = weight_soup.text.split('磅')[0]
-    shangpin['data']['weight'] = "2"
+    if mode == "normal_mode":
+        shangpin['data']['weight'] = weight_soup.text.split('磅')[0]
+    else:
+        shangpin['data']['weight'] = "1"
+
+    transportfee_soup = org_soup.find('div',attrs={'class':'weight-info'})
+    transportfee_soup = transportfee_soup.find('span',attrs={'class':'lb-value J-tran-z-price'})
+    transportfee = int(float(transportfee_soup.text.split('￥')[1]))
+    if mode == "normal_mode" and transportfee != 0:
+        shangpin['data']['overseasTransportFee'] = "5.99"
+    else:
+        shangpin['data']['overseasTransportFee'] = "0"
 
     product_soup = org_soup.find('div',attrs={'class':'nav-list-wrapper'})
     img_soup = product_soup.find_all('img')
@@ -188,50 +207,54 @@ def parser_url(url):
     shangpin['data']['pic4'] = img[4]
     
     product_soup = org_soup.find('div',attrs={'class':'product-desc-wrapper'})
-    del_img = product_soup.find_all('img',attrs={"src":re.compile(r'img.alicdn.com/tps/')})
-    for i in del_img:
-        i.decompose()
-    '''
-    del_img = product_soup.find_all('img',attrs={"src":re.compile(r'TB1NInJHVXXXXaOXVXXXXXXXXXX')})
-    for i in del_img:
-        i.decompose()
-    del_img = product_soup.find_all('img',attrs={"src":re.compile(r'TB1gCBbJVXXXXb0XXXXXXXXXXXX')})
-    for i in del_img:
-        i.decompose()
-    del_img = product_soup.find_all('img',attrs={"src":re.compile(r'TB12BcrJFXXXXXZapXXXXXXXXXX')})
-    for i in del_img:
-        i.decompose()
-    del_img = product_soup.find_all('img',attrs={"src":re.compile(r'TB2Csz7gFXXXXblXXXXXXXXXXXX')})
-    for i in del_img:
-        i.decompose()
-    del_img = product_soup.find_all('img',attrs={"src":re.compile(r'TB1nMsIIXXXXXXsaXXXXXXXXXXX')})
-    for i in del_img:
-        i.decompose()
-    '''
-    del_a = product_soup.find_all('a')
-    for i in del_a:
-        i.decompose()
-    shangpin['data']['description'] = str(product_soup)
-    if shangpin['data']['shopId'] != SHOP_LIST["Amazon.jp"]:
-        p=re.compile(r'<span style=".+;">')
+    if mode == 'normal_mode':
+        shangpin['data']['description'] = str(product_soup)
+    else:
+        del_img = product_soup.find_all('img',attrs={"src":re.compile(r'img.alicdn.com/tps/')})
+        for i in del_img:
+            i.decompose()
+        '''
+        del_img = product_soup.find_all('img',attrs={"src":re.compile(r'TB1NInJHVXXXXaOXVXXXXXXXXXX')})
+        for i in del_img:
+            i.decompose()
+        del_img = product_soup.find_all('img',attrs={"src":re.compile(r'TB1gCBbJVXXXXb0XXXXXXXXXXXX')})
+        for i in del_img:
+            i.decompose()
+        del_img = product_soup.find_all('img',attrs={"src":re.compile(r'TB12BcrJFXXXXXZapXXXXXXXXXX')})
+        for i in del_img:
+            i.decompose()
+        del_img = product_soup.find_all('img',attrs={"src":re.compile(r'TB2Csz7gFXXXXblXXXXXXXXXXXX')})
+        for i in del_img:
+            i.decompose()
+        del_img = product_soup.find_all('img',attrs={"src":re.compile(r'TB1nMsIIXXXXXXsaXXXXXXXXXXX')})
+        for i in del_img:
+            i.decompose()
+        '''
+        del_a = product_soup.find_all('a')
+        for i in del_a:
+            i.decompose()
+
+        shangpin['data']['description'] = str(product_soup)
+        if shangpin['data']['shopId'] != SHOP_LIST["Amazon.jp"]:
+            p=re.compile(r'<span style=".+;">')
+            shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
+            p=re.compile(r'</span>')
+            shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
+
+        p=re.compile(r'<strong>')
         shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
-        p=re.compile(r'</span>')
+        p=re.compile(r'</strong>')
         shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
 
-    p=re.compile(r'<strong>')
-    shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
-    p=re.compile(r'</strong>')
-    shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
+        p=re.compile(r'<font [^>]+>')
+        shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
+        p=re.compile(r'</font>')
+        shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
 
-    p=re.compile(r'<font [^>]+>')
-    shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
-    p=re.compile(r'</font>')
-    shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
-
-    p = re.compile(r'style="[^>]+;"')
-    shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
-    p=re.compile(r'class="product-desc-wrapper"')
-    shangpin['data']['description'] = p.sub('''class="product-desc-wrapper" align="center"''',shangpin['data']['description'])
+        p = re.compile(r'style="[^>]+;"')
+        shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
+        p=re.compile(r'class="product-desc-wrapper"')
+        shangpin['data']['description'] = p.sub('''class="product-desc-wrapper" align="center"''',shangpin['data']['description'])
 
     #for k,v in shangpin['data'].items():
     #   print('%s=%s' % (k,v))
@@ -240,4 +263,5 @@ def parser_url(url):
 
 if __name__ == '__main__':
     url = sys.argv[1]
-    parser_url(url)
+    mode = sys.argv[2]
+    parser_url(url,mode=mode)
