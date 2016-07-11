@@ -138,6 +138,7 @@ def relogin():
     global sess,lgToken,user_name
     error = ''
     qr_img = ''
+    error_code = get_index()
     #print(request.form)
     if request.method == 'POST':
         relogin_is = request.form['relogin_button']
