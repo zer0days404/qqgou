@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- 
 import requests
 import sys
 import os
@@ -83,8 +83,12 @@ def get_org_url(content_soup,shop_id):
     
         if shop_id == SHOP_LIST["Amazon"]:
             #shop_code = rsp.url.split('/')[-1]
-            shop_code = rsp.url.split("dp/")[-1].split('/')[0]
-            url = 'http://www.amazon.com/gp/aw/d/' + shop_code + '/' + ''.join(random.sample(string.ascii_letters + string.digits, 10))
+            #shop_code = rsp.url.split("dp/")[-1].split('/')[0]
+            #url = 'http://www.amazon.com/gp/aw/d/' + shop_code + '/' + ''.join(random.sample(string.ascii_letters + string.digits, 10))
+            #url = 'http://www.amazon.com/gp/aw/d/' + shop_code + '/' + ''.join(random.sample(string.ascii_letters + string.digits, 10))
+            p1 = re.compile(r'.+/[A-Z0-9]{10}')
+            shop_code = p1.match(rsp.url).group().split('/')[-1]
+            url = 'http://www.amazon.com/dp/' + shop_code + '?'
         elif shop_id == SHOP_LIST["eBay"]:
             url = rsp.url.split('?')[0] + '/' + ''.join(random.sample(string.digits, 10))
         elif shop_id == SHOP_LIST["6PM"]:
@@ -97,12 +101,14 @@ def get_org_url(content_soup,shop_id):
         elif shop_id == SHOP_LIST["Amazon.jp"]:
             url=rsp.url
             if "/product/" in rsp.url:
-                shop_code = rsp.url.split("product/")[-1].split('/')[0]
+                #shop_code = rsp.url.split("product/")[-1].split('/')[0]
+                p1 = re.compile(r'.+/[A-Z0-9]{10}')
+                shop_code = p1.match(rsp.url).group().split('/')[-1]
                 url = 'http://www.amazon.co.jp/gp/aw/d/' + shop_code + '/' + ''.join(random.sample(string.ascii_letters + string.digits, 10))
             elif "/dp/" in rsp.url:
                 shop_code = rsp.url.split("dp/")[-1].split('/')[0]
                 url = 'http://www.amazon.co.jp/gp/aw/d/' + shop_code + '/' + ''.join(random.sample(string.ascii_letters + string.digits, 10))
-            shangpin['data']['transportTemplate'] = '17'
+            shangpin['data']['transportTemplate'] = '14'
         return url
     else:
         return None
@@ -199,12 +205,13 @@ def parser_url(url,mode="normal_mode"):
     p=re.compile(r'_\d{3}x\d{3}.+\d$')
     for k,v in enumerate(img_soup):
         img[k] = "http:"+(v.get('data-ks-imagezoom'))
-        img[k] = p.split(img[k])[0]
+        #img[k] = p.split(img[k])[0]
     shangpin['data']['pictureUrl'] = img[0]
-    shangpin['data']['pic1'] = img[1]
-    shangpin['data']['pic2'] = img[2]
-    shangpin['data']['pic3'] = img[3]
-    shangpin['data']['pic4'] = img[4]
+    shangpin['data']['pic1'] = img[2]
+    if img[2] == '':
+        shangpin['data']['pic1'] = img[0]
+    shangpin['data']['pic2'] = img[3]
+    shangpin['data']['pic3'] = img[4]
     
     product_soup = org_soup.find('div',attrs={'class':'product-desc-wrapper'})
     if mode == 'normal_mode':

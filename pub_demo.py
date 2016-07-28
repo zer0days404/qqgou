@@ -163,7 +163,7 @@ def relogin():
                 user_name = urllib.parse.unquote(user_name)
                 user_name = codecs.decode(user_name,'unicode-escape')
                 error = "登陆成功！"
-                print("login success:[%s] [%s]\n" % (user_name,tm))
+                print("login success:\[%s\] \[%s\]\n" % (user_name,tm))
                 return render_template('crawler.html', error1=error,button_name=button_name,user_name=user_name)
             else:
                 button_name = "重新登录"
