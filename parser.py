@@ -205,13 +205,14 @@ def parser_url(url,mode="normal_mode"):
     p=re.compile(r'_\d{3}x\d{3}.+\d$')
     for k,v in enumerate(img_soup):
         img[k] = "http:"+(v.get('data-ks-imagezoom'))
-        #img[k] = p.split(img[k])[0]
+        img[k] = p.split(img[k])[0]
+        img[k] = img[k].split(':')[-1]
     shangpin['data']['pictureUrl'] = img[0]
-    shangpin['data']['pic1'] = img[2]
-    if img[2] == '':
+    shangpin['data']['pic1'] = img[1]
+    if img[1] == '':
         shangpin['data']['pic1'] = img[0]
-    shangpin['data']['pic2'] = img[3]
-    shangpin['data']['pic3'] = img[4]
+    shangpin['data']['pic2'] = img[2]
+    shangpin['data']['pic3'] = img[3]
     
     product_soup = org_soup.find('div',attrs={'class':'product-desc-wrapper'})
     if mode == 'normal_mode':
