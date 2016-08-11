@@ -8,8 +8,8 @@ import string
 from bs4 import BeautifulSoup
 shangpin = {
         'brand':'',
-        'pub_url':"http://daigou.taobao.com/buyer/item/publishItem.htm",
-        'buyer_url':"http://daigou.taobao.com/buyer/index.htm",
+        'pub_url':"http://*****.com/buyer/item/publishItem.htm",
+        'buyer_url':"http://****.com/buyer/index.htm",
         'params_sub_url':{
             "action":"/buyer/submit_url_action", 
             "event_submit_do_submit_url":"anything", 
