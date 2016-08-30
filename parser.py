@@ -37,7 +37,7 @@ shangpin = {
             'categoryId':'400002',#暂时为女士手提包
             "shopId":"1",                       #暂时固定为Amazon
             "shopName":"Amazon",                #暂时固定为Amazon
-            "transportTemplate":"2",            #暂时固定为笨鸟转运美国线
+            "transportTemplate":"12",            #斑马:美中DE特拉华USPS
             "overseasTransportFee":"0",      #暂时固定为0
             "title":'',     #暂时固定为空
             "titleCn":'',   #
@@ -94,7 +94,7 @@ def get_org_url(content_soup,shop_id):
         elif shop_id == SHOP_LIST["6PM"]:
             url = rsp.url + '?' + ''.join(random.sample(string.digits, 7))
         elif shop_id == SHOP_LIST["jomashop"]:
-            url = rsp.url + '?' + ''.join(random.sample(string.digits, 7))
+            url = rsp.url.split('?')[0] + '?' + ''.join(random.sample(string.digits, 4))
         elif shop_id == SHOP_LIST["Ashford"]:
         #    url = rsp.url + "?ref=http://www.guanggoo.com/t/5777"
             url = rsp.url.split('?')[0].split('.pid')[0] + ''.join(random.sample(string.ascii_letters, 2)) + '.pid'
@@ -108,7 +108,7 @@ def get_org_url(content_soup,shop_id):
             elif "/dp/" in rsp.url:
                 shop_code = rsp.url.split("dp/")[-1].split('/')[0]
                 url = 'http://www.amazon.co.jp/gp/aw/d/' + shop_code + '/' + ''.join(random.sample(string.ascii_letters + string.digits, 10))
-            shangpin['data']['transportTemplate'] = '14'
+            shangpin['data']['transportTemplate'] = '9'
         return url
     else:
         return None
@@ -263,10 +263,11 @@ def parser_url(url,mode="normal_mode"):
         shangpin['data']['description'] = p.sub('',shangpin['data']['description'])
         p=re.compile(r'class="product-desc-wrapper"')
         shangpin['data']['description'] = p.sub('''class="product-desc-wrapper" align="center"''',shangpin['data']['description'])
-
-    #for k,v in shangpin['data'].items():
-    #   print('%s=%s' % (k,v))
-    #print("-------------parser end--------------\r\n")
+    '''
+    for k,v in shangpin['data'].items():
+       print('%s=%s' % (k,v))
+    print("-------------parser end--------------\r\n")
+    '''
     return True
 
 if __name__ == '__main__':
